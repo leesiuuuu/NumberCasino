@@ -193,7 +193,7 @@ public class MainGame : MonoBehaviour
 
 		Debug.Log($"동정심에 의해 변경된 확률 : {model.ChangePercentage}%");
 
-		bool isChange = UnityEngine.Random.Range(0, 100) > model.ChangePercentage ? true : false;
+		bool isChange = UnityEngine.Random.Range(0, 100) <= model.ChangePercentage ? true : false;
 		if (isChange)
 		{
 			int n = 1 - model.SeletedIndex;
