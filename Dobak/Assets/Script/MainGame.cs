@@ -128,13 +128,16 @@ public class CasinoModel
 public class MainGame : MonoBehaviour
 {
 	[Header("UI")]
-	public TMP_Text Percentage;
 	public TMP_Text Number;
 
 	public Slider slider;
 	public TMP_Text myNumber;
 
+	[Header("DevelopCanvas")]
+	public TMP_Text Percentage;
 	public PersonalityModule.Personality module;
+	public TMP_Text moduleText;
+	public TMP_Text pText;
 
 	private int randomRand = 5;
 
@@ -150,12 +153,13 @@ public class MainGame : MonoBehaviour
 		module = (PersonalityModule.Personality)value.GetValue(UnityEngine.Random.Range(0, value.Length));
 
 		model = new CasinoModel(module);
-		Debug.Log($"적용된 성격 모듈 : {module.ToString()}");
+		pText.text = "현재 특성 :";
 		foreach(var action in model.SeletedPersonalitys)
 		{
-			Debug.Log($"적용된 성격 : {action.Key}");
+			pText.text += " " + action.Key.ToString();
 		}
-		model.percentage = 20f;
+		moduleText.text = "현재 모듈 : " + module.ToString();
+		model.percentage = 0f;
 	}
 	private void Start()
 	{
@@ -237,9 +241,11 @@ public class MainGame : MonoBehaviour
 	private void UpdateUI()
 	{
 		slider.value = model.percentage / 100;
-		Percentage.text = "바꿀 확률 : " + model.ChangePercentage + "%";
+
 		Number.text = "선택한 숫자 : " + model.nums[model.SeletedIndex];
 		myNumber.text = "내 숫자 : " + _myNumber;
+
+		Percentage.text = "바꿀 확률 : " + model.ChangePercentage + "%";
 	}
 	private void InitNumber()
 	{
