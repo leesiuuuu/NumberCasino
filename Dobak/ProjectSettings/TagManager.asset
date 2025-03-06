@@ -41,3 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Dealer
+    uniqueID: 3847462427
+    locked: 0
+  - name: Table
+    uniqueID: 2591405691
+    locked: 0
+  - name: Dealer_Arm
+    uniqueID: 1764775797
+    locked: 0
+  - name: Player
+    uniqueID: 2514430375
+    locked: 0
+  - name: UI
+    uniqueID: 3035355695
+    locked: 0

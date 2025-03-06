@@ -138,6 +138,10 @@ public class MainGame : MonoBehaviour
 	public PersonalityModule.Personality module;
 	public TMP_Text moduleText;
 	public TMP_Text pText;
+	[Header("ModelSprite")]
+	public Model spriteChanger;
+
+	private Animator animator;
 
 	private int randomRand = 5;
 
@@ -149,10 +153,15 @@ public class MainGame : MonoBehaviour
 	private int count = 0;
 	private void Awake()
 	{
-		var value = System.Enum.GetValues(enumType: typeof(PersonalityModule.Personality));
-		module = (PersonalityModule.Personality)value.GetValue(UnityEngine.Random.Range(0, value.Length));
+		//모듈을 랜덤으로 하나 골라줌
+/*		var value = System.Enum.GetValues(enumType: typeof(PersonalityModule.Personality));
+		module = (PersonalityModule.Personality)value.GetValue(UnityEngine.Random.Range(0, value.Length));*/
 
+		//데이터 로드 및 관련 로그 출력
 		model = new CasinoModel(module);
+
+		spriteChanger.ChangeModelSprite(module);
+
 		pText.text = "현재 특성 :";
 		foreach(var action in model.SeletedPersonalitys)
 		{
@@ -164,6 +173,7 @@ public class MainGame : MonoBehaviour
 	private void Start()
 	{
 		Init();
+		animator = spriteChanger.gameObject.GetComponent<Animator>();
 		model.ChangeValue(_myNumber, 5);
 	}
 	private void Update()
@@ -312,9 +322,16 @@ public class MainGame : MonoBehaviour
 		{
 			case PersonalityModule.Personality.Normal:
 				if (UnityEngine.Random.value > 0.5f)
+				{
+					if (UnityEngine.Random.value > 0.5f) StartCoroutine(ChangeSprite(2));
+					else spriteChanger.StartCoroutine(ChangeSprite(1));
 					model.percentage -= 3.5f;
+				}
 				else
+				{
+					StartCoroutine(ChangeSprite(3));
 					model.percentage += 6f;
+				}
 				break;
 			case PersonalityModule.Personality.Glum:
 				if (UnityEngine.Random.value > 0.3f)
@@ -375,5 +392,16 @@ public class MainGame : MonoBehaviour
 		}
 		model.percentage = Mathf.Clamp(model.percentage, 0, 100);
 		slider.value = model.percentage / 100;
+	}
+
+	private IEnumerator ChangeSprite(int index)
+	{
+		spriteChanger.ChangeSprite(index);
+		animator.SetTrigger("Change");
+		//딜러 말하기
+		yield return new WaitForSeconds(1f);
+		spriteChanger.ChangeSprite(0);
+		animator.SetTrigger("Change");
+		yield break;
 	}
 }
