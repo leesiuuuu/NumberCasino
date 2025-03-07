@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using TMPro.SpriteAssetUtilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -398,10 +399,14 @@ public class MainGame : MonoBehaviour
 	{
 		spriteChanger.ChangeSprite(index);
 		animator.SetTrigger("Change");
+
 		//딜러 말하기
+		yield return StartCoroutine(spriteChanger.TextLogAppear(spriteChanger.currentLogs));
 		yield return new WaitForSeconds(1f);
+
 		spriteChanger.ChangeSprite(0);
 		animator.SetTrigger("Change");
+		spriteChanger.Log.text = "";
 		yield break;
 	}
 }
