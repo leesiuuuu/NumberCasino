@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using TMPro.SpriteAssetUtilities;
 using UnityEngine;
 using UnityEngine.UI;
+using static System.Net.Mime.MediaTypeNames;
 
 public class CasinoModel
 {
@@ -133,6 +135,7 @@ public class MainGame : MonoBehaviour
 
 	public Slider slider;
 	public TMP_Text myNumber;
+	public TMP_Text PlayerText;
 
 	[Header("DevelopCanvas")]
 	public TMP_Text Percentage;
@@ -151,6 +154,15 @@ public class MainGame : MonoBehaviour
 	private int _myNumber = 0;
 
 	private bool Changed = false;
+
+	public enum State
+	{
+		Bergain,
+		Provocation,
+		Begging
+	}
+
+
 	private int count = 0;
 	private void Awake()
 	{
@@ -324,13 +336,13 @@ public class MainGame : MonoBehaviour
 			case PersonalityModule.Personality.Normal:
 				if (UnityEngine.Random.value > 0.5f)
 				{
-					if (UnityEngine.Random.value > 0.5f) StartCoroutine(ChangeSprite(2));
-					else spriteChanger.StartCoroutine(ChangeSprite(1));
+					if (UnityEngine.Random.value > 0.5f) StartCoroutine(ChangeSprite(2, State.Provocation)); //화남
+					else spriteChanger.StartCoroutine(ChangeSprite(1, State.Provocation)); //무시
 					model.percentage -= 3.5f;
 				}
 				else
 				{
-					StartCoroutine(ChangeSprite(3));
+					StartCoroutine(ChangeSprite(3, State.Provocation)); //찔림
 					model.percentage += 6f;
 				}
 				break;
@@ -355,8 +367,6 @@ public class MainGame : MonoBehaviour
 			case PersonalityModule.Personality.Evil:
 				model.percentage -= 5f; break;
 		}
-		model.percentage = Mathf.Clamp(model.percentage, 0, 100);
-		slider.value = model.percentage / 100;
 	}
 	//빌붙기
 	public void Begging()
@@ -395,18 +405,37 @@ public class MainGame : MonoBehaviour
 		slider.value = model.percentage / 100;
 	}
 
-	private IEnumerator ChangeSprite(int index)
+	private IEnumerator ChangeSprite(int index, State state)
 	{
-		spriteChanger.ChangeSprite(index);
+		//플레이어 말하기
+		yield return StartCoroutine(PlayerTalk("임시 플레이어 텍스트"));
+		yield return new WaitForSeconds(1f);
+
+		//값 업데이트
+		model.percentage = Mathf.Clamp(model.percentage, 0, 100);
+		slider.value = model.percentage / 100;
+
+		spriteChanger.ChangeSprite(index, state);
 		animator.SetTrigger("Change");
 
 		//딜러 말하기
 		yield return StartCoroutine(spriteChanger.TextLogAppear(spriteChanger.currentLogs));
 		yield return new WaitForSeconds(1f);
 
-		spriteChanger.ChangeSprite(0);
+		spriteChanger.ChangeSprite(0, state);
 		animator.SetTrigger("Change");
 		spriteChanger.Log.text = "";
+		yield break;
+	}
+
+	private IEnumerator PlayerTalk(string value)
+	{
+		PlayerText.text = "";
+		for (int i = 0; i < value.Length; i++)
+		{
+			PlayerText.text += value[i];
+			yield return new WaitForSeconds(0.05f);
+		}
 		yield break;
 	}
 }
